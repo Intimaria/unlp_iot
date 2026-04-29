@@ -1,0 +1,94 @@
+{
+  "title": "ESP32 Air Quality Station",
+  "tags": ["esp32", "iot"],
+  "timezone": "browser",
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "type": "gauge",
+      "title": "Temperatura",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "targets": [ { "expr": "esp32_temperature", "refId": "A" } ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0, "max": 50, "unit": "celsius",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 30 },
+              { "color": "red", "value": 40 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "gauge",
+      "title": "Humedad",
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "targets": [ { "expr": "esp32_humidity", "refId": "A" } ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0, "max": 100, "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 40 },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Historial de Gas (MQ135)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [ { "expr": "esp32_gas", "legendFormat": "Gas Raw", "refId": "A" } ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "orange" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2 }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Histórico de Clima",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "esp32_temperature", "legendFormat": "Temp (°C)", "refId": "A" },
+        { "expr": "esp32_humidity", "legendFormat": "Humedad (%)", "refId": "B" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 2 }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Estado del LED",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 8 },
+      "targets": [ { "expr": "esp32_led_status", "refId": "A" } ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "APAGADO", "color": "gray" },
+                "1": { "text": "ENCENDIDO", "color": "green" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

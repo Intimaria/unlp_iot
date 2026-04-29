@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32 Clima - TP1 (Avanzado)</title>
+  <style>
+    html {
+      font-family: Arial;
+      display: inline-block;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 2.0rem;
+      color: #333;
+    }
+
+    p {
+      font-size: 1.5rem;
+    }
+
+    body {
+      max-width: 400px;
+      margin: 0px auto;
+      padding-top: 25px;
+      background-color: #f4f4f9;
+    }
+
+    .caja {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn {
+      border: none;
+      color: white;
+      padding: 16px 30px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 20px;
+      margin: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      filter: brightness(0.85);
+    }
+  </style>
+  <!-- Importar Chart.js para el historial de mediciones -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div style="background-color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0px 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; gap: 15px; font-size: 0.95rem; color: #555;">
+    <span>💡 Haz clic acá para probar la luz LED de la placa:</span>
+    <button id="btn-led" style="background-color: #9E9E9E; border: none; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 0.9rem;" onclick="toggleLed()">...</button>
+  </div>
+
+  <h2>Panel ESP32 Asincrónico</h2>
+  <div class="caja">
+    <p>🌡️ Temperatura: <strong id="temp">-</strong> &deg;C</p>
+    <p>💧 Humedad: <strong id="hum">-</strong> &percnt;</p>
+    <p>💨 Nivel de Gas: <strong id="gas">-</strong> (Raw)</p>
+  </div>
+
+  <hr style="margin: 20px 0; border: 1px solid #ddd;">
+  <p>Historial de Nivel de Gas:</p>
+  <div
+    style="background-color: white; padding: 10px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
+    <canvas id="gasChart" width="400" height="200"></canvas>
+  </div>
+  <script>
+    // Inicializar el gráfico de historial
+    const ctx = document.getElementById('gasChart').getContext('2d');
+    const gasChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Nivel de Gas (Raw)',
+          data: [],
+          borderColor: '#FF5722',
+          backgroundColor: 'rgba(255, 87, 34, 0.2)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { x: { display: false }, y: { beginAtZero: true } },
+        animation: { duration: 0 } // Desactiva la animación p
+      }
+    });
+
+    const maxDataPoints = 30; // Guardar las últimas 30 mediciones
+
+    function updateData() {
+      fetch('/api/metrics')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('temp').innerText = data.t;
+          document.getElementById('hum').innerText = data.h;
+          document.getElementById('gas').innerText = data.gas;
+
+          let btn = document.getElementById('btn-led');
+          if (data.led == 1) {
+            btn.style.backgroundColor = '#4CAF50';
+            btn.innerText = 'ON';
+          } else {
+            btn.style.backgroundColor = '#9E9E9E';
+            btn.innerText = 'OFF';
+          }
+
+          // Actualizar el historial del gráfico
+          let timeNow = new Date().toLocaleTimeString();
+          gasChart.data.labels.push(timeNow);
+          gasChart.data.datasets[0].data.push(data.gas);
+          if (gasChart.data.labels.length > maxDataPoints) {
+            gasChart.data.labels.shift();
+            gasChart.data.datasets[0].data.shift();
+          }
+          gasChart.update();
+        });
+    }
+
+    // Actualiza los datos apenas carga la página y luego cada 2 segundos
+    window.onload = updateData;
+    setInterval(updateData, 2000);
+
+    // Llamada AJAX para alternar el LED sin recargar la página
+    function toggleLed() {
+      fetch('/toggle').then(() => updateData()); // Actualiza inmediatamente después de tocar
+    }
+  </script>
+</body>
+
+</html>
