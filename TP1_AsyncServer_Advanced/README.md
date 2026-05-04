@@ -6,9 +6,10 @@ An IoT station built for ESP32. This project features an asynchronous web server
 * **Asynchronous Architecture:** Uses `ESPAsyncWebServer` to support multiple clients without blocking the processor.
 * **Separate Frontend (SPIFFS):** HTML, CSS, and JS are served directly from the ESP32's flash memory, keeping the C++ code clean.
 * **Single Page Application (SPA):** Uses AJAX (`fetch`) to update telemetry every 2 seconds without page reloads.
-* **Live History Graph:** Integrates `Chart.js` for real-time visualization of gas levels directly in the browser.
+* **Live History Graph:** Integrates `Chart.js` for real-time visualization of gas levels directly in the browser. Also can be visualized in Grafana with the InfluxDB datasource.
 * **Captive Portal:** Uses `WiFiManager` to dynamically configure Wi-Fi credentials without hardcoding them.
-* **Monitoring Stack:** Exposes a native `/metrics` endpoint for **Prometheus**, and includes a `docker-compose.yml` to spin up **Grafana** locally.
+* **Monitoring Stack:** Exposes a native `/metrics` endpoint for **Prometheus**, and includes a `docker-compose.yml` to spin up **Grafana** and **InfluxDB** locally.
+* **Responsiveness:** The frontend is responsive and adapts to different screen sizes, for mobile, tablet and computer. 
 
 ## Hardware Requirements
 * **ESP32 Development Board**
@@ -72,10 +73,8 @@ To collect long-term historical data and create advanced dashboards, a Docker st
    ```
 2. Enter Grafana from your browser: `http://localhost:3000`.
 3. Log in with credentials `admin` / `admin`.
-4. Add **Prometheus** as a Data Source using the URL `http://prometheus:9090`.
-   *(**IMPORTANT**: Do NOT use `localhost`, as Grafana runs inside a Docker container and needs to use the service name to find Prometheus).*
-5. **Import the Dashboard:**
+4. **Import the Dashboard:**
    - In the left menu, go to **Dashboards -> Import**.
-   - Click **"Upload JSON file"** and select the `grafana_dashboard.json` file included in this folder.
-   - Select Prometheus as the Data Source and click Import.
-   - You will see an Air Quality control panel in Grafana.
+   - Click **"Upload JSON file"** and select the `grafana_dashboard_influxdb.json` file included in this folder.
+   - Select **InfluxDB_ESP32** as the Data Source when prompted and click Import.
+   - You will see a complete, real-time Air Quality control panel in Grafana.

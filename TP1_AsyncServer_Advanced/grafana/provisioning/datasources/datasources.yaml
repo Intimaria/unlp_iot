@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      httpMethod: POST
+
+  - name: InfluxDB_ESP32
+    type: influxdb
+    uid: influxdb_esp32
+    access: proxy
+    url: http://influxdb:8086
+    database: esp32_metrics
+    isDefault: false
+    jsonData:
+      httpMode: GET

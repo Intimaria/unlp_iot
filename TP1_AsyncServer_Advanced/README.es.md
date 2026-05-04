@@ -6,9 +6,10 @@ Una estación IoT construida para ESP32. Este proyecto cuenta con un servidor we
 * **Arquitectura Asincrónica:** Utiliza `ESPAsyncWebServer` para soportar múltiples clientes sin bloquear el procesador.
 * **Frontend Separado (SPIFFS):** El HTML, CSS y JS se sirven directamente desde la memoria flash del ESP32, manteniendo el código C++ totalmente limpio.
 * **Single Page Application (SPA):** Utiliza peticiones AJAX (`fetch`) para actualizar la telemetría cada 2 segundos sin recargar la página.
-* **Gráfico Histórico en Vivo:** Integra `Chart.js` para la visualización en tiempo real de los niveles de gas directamente en el navegador.
+* **Gráfico Histórico en Vivo:** Integra `Chart.js` para la visualización en tiempo real de los niveles de gas directamente en el navegador. Tambien se puede visualizar en Grafana con el datasource de InfluxDB.
 * **Portal Cautivo:** Usa `WiFiManager` para configurar dinámicamente las credenciales Wi-Fi sin tener que escribirlas en el código.
-* **Stack de Monitoreo:** Expone un endpoint nativo `/metrics` para **Prometheus**, e incluye un `docker-compose.yml` para levantar **Grafana** localmente
+* **Stack de Monitoreo:** Expone un endpoint nativo `/metrics` para **Prometheus**, e incluye un `docker-compose.yml` para levantar **Grafana** e **InfluxDB** localmente
+* **Responsividad:** El frontend es responsivo y se adapta a diferentes tamaños de pantalla, para celular, tablet y computadora.
 
 ## Requisitos de Hardware
 * **Placa de Desarrollo ESP32**
@@ -72,10 +73,8 @@ Para recolectar datos históricos a largo plazo y crear dashboards avanzados, se
    ```
 2. Entra a Grafana desde tu navegador: `http://localhost:3000`.
 3. Inicia sesión con las credenciales `admin` / `admin`.
-4. Agrega **Prometheus** como Data Source utilizando la URL `http://prometheus:9090`.
-   *(**IMPORTANTE**: NO uses `localhost`, ya que Grafana corre dentro de un contenedor Docker y necesita usar el nombre del servicio para encontrar a Prometheus).*
-5. **Importar el Dashboard:**
+4. **Importar el Dashboard:**
    - En el menú izquierdo, ve a **Dashboards -> Import**.
    - Haz clic en **"Upload JSON file"** y selecciona el archivo `grafana_dashboard.json` que viene incluido en esta carpeta.
-   - Selecciona Prometheus como Data Source y dale a Import.
-   - Verás un panel de control de Calidad de Aire en Grafana
+   - Selecciona **InfluxDB_ESP32** como Data Source cuando lo pida y dale a Import.
+   - Verás un panel de control de Calidad de Aire en Grafana.

@@ -1,18 +1,26 @@
 {
-  "title": "ESP32 Air Quality Station",
-  "tags": ["esp32", "iot"],
+  "title": "ESP32 Air Quality — InfluxDB Historics",
+  "tags": ["esp32", "iot", "influxdb", "telegraf"],
   "timezone": "browser",
-  "refresh": "5s",
+  "refresh": "10s",
   "schemaVersion": 36,
   "panels": [
     {
-      "type": "gauge",
-      "title": "Temperatura",
-      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
-      "targets": [ { "expr": "esp32_temperature", "refId": "A" } ],
+      "id": 1,
+      "type": "stat",
+      "title": "Temperatura Actual",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_esp32" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT last(\"gauge\") FROM \"esp32_temperature\" WHERE $timeFilter",
+          "rawQuery": true
+        }
+      ],
       "fieldConfig": {
         "defaults": {
-          "min": 0, "max": 50, "unit": "celsius",
+          "unit": "celsius",
           "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
@@ -26,13 +34,21 @@
       }
     },
     {
-      "type": "gauge",
-      "title": "Humedad",
-      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
-      "targets": [ { "expr": "esp32_humidity", "refId": "A" } ],
+      "id": 2,
+      "type": "stat",
+      "title": "Humedad Actual",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_esp32" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT last(\"gauge\") FROM \"esp32_humidity\" WHERE $timeFilter",
+          "rawQuery": true
+        }
+      ],
       "fieldConfig": {
         "defaults": {
-          "min": 0, "max": 100, "unit": "percent",
+          "unit": "percent",
           "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
@@ -46,36 +62,45 @@
       }
     },
     {
-      "type": "timeseries",
-      "title": "Historial de Gas (MQ135)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-      "targets": [ { "expr": "esp32_gas", "legendFormat": "Gas Raw", "refId": "A" } ],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "orange" },
-          "custom": { "fillOpacity": 20, "lineWidth": 2 }
-        }
-      }
-    },
-    {
-      "type": "timeseries",
-      "title": "Histórico de Clima",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "type": "stat",
+      "title": "Gas (MQ135)",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_esp32" },
       "targets": [
-        { "expr": "esp32_temperature", "legendFormat": "Temp (°C)", "refId": "A" },
-        { "expr": "esp32_humidity", "legendFormat": "Humedad (%)", "refId": "B" }
+        {
+          "refId": "A",
+          "query": "SELECT last(\"gauge\") FROM \"esp32_gas\" WHERE $timeFilter",
+          "rawQuery": true
+        }
       ],
       "fieldConfig": {
         "defaults": {
-          "custom": { "fillOpacity": 10, "lineWidth": 2 }
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          }
         }
       }
     },
     {
+      "id": 4,
       "type": "stat",
-      "title": "Estado del LED",
-      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 8 },
-      "targets": [ { "expr": "esp32_led_status", "refId": "A" } ],
+      "title": "Estado LED",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_esp32" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT last(\"gauge\") FROM \"esp32_led_status\" WHERE $timeFilter",
+          "rawQuery": true
+        }
+      ],
       "fieldConfig": {
         "defaults": {
           "mappings": [
@@ -87,6 +112,71 @@
               }
             }
           ]
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Histórico de Temperatura",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_esp32" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT mean(\"gauge\") FROM \"esp32_temperature\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "alias": "Temperatura (°C)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": { "mode": "fixed", "fixedColor": "orange" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2, "gradientMode": "opacity" }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Histórico de Humedad",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_esp32" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT mean(\"gauge\") FROM \"esp32_humidity\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "alias": "Humedad (%)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "fixed", "fixedColor": "blue" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2, "gradientMode": "opacity" }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Histórico de Gas",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_esp32" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT mean(\"gauge\") FROM \"esp32_gas\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "alias": "Gas Raw"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "purple" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2, "gradientMode": "opacity" }
         }
       }
     }
