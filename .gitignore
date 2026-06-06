@@ -1,2 +1,11 @@
 *.bin
 cursada/
+*.zip
+
+# Datos de runtime generados por Docker 
+TP1_AsyncServer_Advanced/grafana/data/
+TP2_MQTT/influxdb/
+TP2_MQTT/mosquitto/data/
+TP2_MQTT/mosquitto/log/
+TP2_MQTT/nodered/data/
+TP2_MQTT/grafana/data/

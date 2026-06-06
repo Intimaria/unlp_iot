@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 IoT Dashboard</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="index.css">
+    <!-- MQTT.js CDN -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+    <div class="background-decor">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <header>
+            <div class="header-content">
+                <h1>ESP32 Weather Station</h1>
+                <p class="subtitle">Monitoreo Ambiental en Tiempo Real vía MQTT</p>
+            </div>
+            <div id="mqtt-status" class="status-badge disconnected">
+                <span class="status-dot"></span>
+                <span class="status-text">Desconectado</span>
+            </div>
+        </header>
+
+        <main class="grid-layout">
+            <!-- Temperatura -->
+            <div class="card glass-card card-temp">
+                <div class="card-icon">
+                    <i class="fa-solid fa-temperature-half"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Temperatura</h3>
+                    <div class="value-display">
+                        <span id="temp-val">--.-</span><span class="unit">°C</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="temp-progress" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Humedad -->
+            <div class="card glass-card card-hum">
+                <div class="card-icon">
+                    <i class="fa-solid fa-droplet"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Humedad</h3>
+                    <div class="value-display">
+                        <span id="hum-val">--.-</span><span class="unit">%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="hum-progress" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calidad del Aire (Gas) -->
+            <div class="card glass-card card-gas">
+                <div class="card-icon">
+                    <i class="fa-solid fa-wind"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Calidad del Aire (Gas)</h3>
+                    <div class="value-display">
+                        <span id="gas-val">----</span><span class="unit"> ADC</span>
+                    </div>
+                    <div class="status-label">
+                        Nivel: <span id="gas-status" class="label-normal">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Luminosidad (LDR) -->
+            <div class="card glass-card card-light">
+                <div class="card-icon">
+                    <i class="fa-solid fa-sun"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Luminosidad</h3>
+                    <div class="value-display">
+                        <span id="light-val">----</span><span class="unit"> ADC</span>
+                    </div>
+                    <div class="status-label">
+                        Ambiente: <span id="light-status" class="label-normal">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actuadores (LED de Control) -->
+            <div class="card glass-card card-actuators full-width">
+                <div class="card-icon">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div class="actuator-controls">
+                    <div>
+                        <h3>Control del LED Integrado</h3>
+                        <p class="desc">Envía comandos MQTT bidireccionales en tiempo real al pin digital 2.</p>
+                    </div>
+                    <div class="toggle-container">
+                        <label class="switch">
+                            <input type="checkbox" id="led-switch">
+                            <span class="slider round"></span>
+                        </label>
+                        <span id="led-status-text" class="led-off">Apagado</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Info -->
+            <div class="card glass-card card-system full-width">
+                <div class="card-icon">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <div class="system-details">
+                    <h3>Detalles del Sistema</h3>
+                    <div class="system-grid">
+                        <div class="sys-item">
+                            <span class="sys-label">Broker IP:</span>
+                            <span id="broker-ip" class="sys-val">--.--.--.--</span>
+                        </div>
+                        <div class="sys-item">
+                            <span class="sys-label">Puerto WebSockets:</span>
+                            <span class="sys-val">9001</span>
+                        </div>
+                        <div class="sys-item">
+                            <span class="sys-label">Topic Suscrito:</span>
+                            <span class="sys-val">sensor/ambiente</span>
+                        </div>
+                        <div class="sys-item">
+                            <span class="sys-label">Último Mensaje:</span>
+                            <span id="last-update" class="sys-val">Nunca</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2026 Estación de Monitoreo IoT. Desarrollado con ❤️ para ESP32 & MQTT.</p>
+        </footer>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="index.js"></script>
+</body>
+</html>

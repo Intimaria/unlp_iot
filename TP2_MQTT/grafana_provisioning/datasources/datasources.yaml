@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    uid: influxdb_iot
+    access: proxy
+    url: http://influxdb:8086
+    database: iot
+    isDefault: true
+    jsonData:
+      httpMode: GET

@@ -1,0 +1,20 @@
+# ESP32 and Arduino
+build/
+*.bin
+*.elf
+*.bin.map
+
+# Node and UI
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Docker and Databases
+.docker_data/
+nodered/.sessions.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+.DS_Store

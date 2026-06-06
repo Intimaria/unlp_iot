@@ -1,0 +1,205 @@
+{
+  "title": "ESP32 Weather Station — InfluxDB Historics",
+  "tags": ["esp32", "iot", "influxdb", "mqtt"],
+  "timezone": "browser",
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Temperatura Actual",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT last(\"temperatura\") FROM \"ambiente\" WHERE $timeFilter",
+          "rawQuery": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 30 },
+              { "color": "red", "value": 40 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Humedad Actual",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT last(\"humedad\") FROM \"ambiente\" WHERE $timeFilter",
+          "rawQuery": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 40 },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Gas (MQ135)",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT last(\"calidad_aire\") FROM \"ambiente\" WHERE $timeFilter",
+          "rawQuery": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Luz (LDR)",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT last(\"luz\") FROM \"ambiente\" WHERE $timeFilter",
+          "rawQuery": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 2000 },
+              { "color": "red", "value": 3500 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Histórico de Temperatura",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT mean(\"temperatura\") FROM \"ambiente\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "alias": "Temperatura (°C)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": { "mode": "fixed", "fixedColor": "orange" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2, "gradientMode": "opacity" }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Histórico de Humedad",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT mean(\"humedad\") FROM \"ambiente\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "alias": "Humedad (%)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "fixed", "fixedColor": "blue" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2, "gradientMode": "opacity" }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Histórico de Gas (MQ135)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT mean(\"calidad_aire\") FROM \"ambiente\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "alias": "Gas Raw"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "purple" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2, "gradientMode": "opacity" }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Histórico de Luz (LDR)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "influxdb", "uid": "influxdb_iot" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "SELECT mean(\"luz\") FROM \"ambiente\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "alias": "Luz Raw"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "yellow" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2, "gradientMode": "opacity" }
+        }
+      }
+    }
+  ]
+}

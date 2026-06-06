@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # Mosquitto - Broker MQTT
+  # ==========================================
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: iot_mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto_config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./.docker_data/mosquitto/data:/mosquitto/data
+      - ./.docker_data/mosquitto/log:/mosquitto/log
+
+  # ==========================================
+  # Node-RED - Procesamiento de flujos
+  # ==========================================
+  nodered:
+    build: ./nodered
+    image: iot_nodered:local
+    container_name: iot_nodered
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    volumes:
+      - ./nodered/data:/data
+    depends_on:
+      - mosquitto
+      - influxdb
+
+  # ==========================================
+  # InfluxDB - Base de datos de series temporales (v1.8)
+  # ==========================================
+  influxdb:
+    image: influxdb:1.8
+    container_name: iot_influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      # Crear la base de datos por defecto 'iot' automáticamente
+      - INFLUXDB_DB=iot
+    volumes:
+      - ./.docker_data/influxdb/data:/var/lib/influxdb
+
+  # ==========================================
+  # Grafana - Dashboard de visualización
+  # ==========================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: iot_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana_provisioning:/etc/grafana/provisioning
+    depends_on:
+      - influxdb
+
+volumes:
+  grafana_data:
