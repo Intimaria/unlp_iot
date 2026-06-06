@@ -7,14 +7,18 @@ Una estación IoT construida para ESP32. Este proyecto extiende el TP1 incorpora
 * **Protocolo MQTT:** Comunicación ultraliviana ESP32 → broker, ideal para IoT con recursos limitados.
 * **Portal Cautivo (WiFiManager):** Configura Wi-Fi y la IP del broker MQTT sin tocar el código — sin credenciales hardcodeadas.
 * **Pipeline de datos:** `ESP32 → Mosquitto → Node-RED → InfluxDB → Grafana`.
+* **Bot de Telegram:** Consulta remota del estado de la estación mediante comandos (manejado por Node-RED).
 * **Promediado de sensores analógicos:** 10 lecturas por ciclo para estabilizar el ruido del MQ135 y el LDR.
 * **Stack Docker completo:** Un solo `docker-compose up -d` levanta todo el backend.
 
 ## Arquitectura
 
-```
+```text
 ESP32 + Sensores  →  Mosquitto (MQTT)  →  Node-RED  →  InfluxDB  →  Grafana
      (publica JSON)     (broker)        (transforma)  (persiste)   (visualiza)
+                                            ↓
+                                       Telegram Bot
+                                      (responde a /status)
 ```
 
 ## Hardware Requerido
@@ -140,6 +144,14 @@ Para cargar el sitio web en la memoria flash de tu ESP32:
    ./subir_web.sh
    ```
 3. Una vez subido, abrí **http://<IP_DE_TU_ESP32>** en tu navegador (la IP se imprime en el Monitor Serie al conectarse al Wi-Fi).
+
+### 6. Bot de Telegram (Consultas Remotas)
+El pipeline en Node-RED incluye un flujo para responder comandos de Telegram y así consultar el estado de la estación sin necesidad de abrir los dashboards web.
+Para habilitar tu propio bot después de clonar el repositorio:
+1. Asegurate de que el contenedor de Node-RED haya sido construido ejecutando `docker-compose up -d --build nodered` (para que instale el plugin de Telegram).
+2. Creá un bot en Telegram hablando con **@BotFather** y obtené el **API Token**.
+3. Abrí Node-RED (**http://localhost:1880**). En la pestaña "Telegram Bot", hacé doble clic en el nodo azul **"Receive Commands"**, ingresá a la configuración del Bot (ícono del lápiz) y pegá tu Token.
+4. Hacé clic en **Deploy**. ¡Listo! Ahora podés enviar el comando `/status` por chat a tu bot para recibir las métricas en tiempo real.
 
 ## Conclusiones
 

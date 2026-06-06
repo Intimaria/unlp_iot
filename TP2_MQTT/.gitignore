@@ -11,7 +11,12 @@ yarn-error.log*
 
 # Docker and Databases
 .docker_data/
-nodered/.sessions.json
+
+# Node-RED persistence (Keep flows, ignore credentials and modules)
+nodered/data/*
+!nodered/data/flows.json
+!nodered/data/settings.js
+!nodered/data/package.json
 
 # IDEs
 .vscode/
