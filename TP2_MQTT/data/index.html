@@ -66,22 +66,6 @@
                 </div>
             </div>
 
-            <!-- Calidad del Aire (Gas) -->
-            <div class="card glass-card card-gas">
-                <div class="card-icon">
-                    <i class="fa-solid fa-wind"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Calidad del Aire (Gas)</h3>
-                    <div class="value-display">
-                        <span id="gas-val">----</span><span class="unit"> ADC</span>
-                    </div>
-                    <div class="status-label">
-                        Nivel: <span id="gas-status" class="label-normal">Cargando...</span>
-                    </div>
-                </div>
-            </div>
-
             <!-- Luminosidad (LDR) -->
             <div class="card glass-card card-light">
                 <div class="card-icon">
@@ -94,6 +78,41 @@
                     </div>
                     <div class="status-label">
                         Ambiente: <span id="light-status" class="label-normal">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calidad del Aire (Gases MQ135) -->
+            <div class="card glass-card card-gas full-width">
+                <div class="card-icon">
+                    <i class="fa-solid fa-wind"></i>
+                </div>
+                <div class="card-info" style="width: 100%;">
+                    <h3>Calidad del Aire (Sensores MQ135)</h3>
+                    <div class="system-grid" style="margin-top: 15px;">
+                        <div class="sys-item">
+                            <span class="sys-label">Dióxido de Carbono (CO₂):</span>
+                            <span id="co2-val" class="sys-val">---- ppm</span>
+                        </div>
+                        <div class="sys-item">
+                            <span class="sys-label">Monóxido de Carbono (CO):</span>
+                            <span id="co-val" class="sys-val">---- ppm</span>
+                        </div>
+                        <div class="sys-item">
+                            <span class="sys-label">Alcohol:</span>
+                            <span id="alcohol-val" class="sys-val">---- ppm</span>
+                        </div>
+                        <div class="sys-item">
+                            <span class="sys-label">Amoníaco (NH₄):</span>
+                            <span id="nh4-val" class="sys-val">---- ppm</span>
+                        </div>
+                        <div class="sys-item">
+                            <span class="sys-label">Tolueno:</span>
+                            <span id="tolueno-val" class="sys-val">---- ppm</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.85em; color: rgba(255,255,255,0.7); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                        <strong>Valores de referencia saludables (aprox.):</strong> CO₂: ~400-1000 ppm | CO: &lt; 9 ppm | Alcohol: &lt; 2 ppm | NH₄: &lt; 1 ppm | Tolueno: &lt; 1 ppm
                     </div>
                 </div>
             </div>
