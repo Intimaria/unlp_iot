@@ -3,11 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const tempProgress = document.getElementById('temp-progress');
     const humVal = document.getElementById('hum-val');
     const humProgress = document.getElementById('hum-progress');
-    const gasVal = document.getElementById('gas-val');
-    const gasStatus = document.getElementById('gas-status');
+    const co2Val = document.getElementById('co2-val');
+    const coVal = document.getElementById('co-val');
+    const alcoholVal = document.getElementById('alcohol-val');
+    const nh4Val = document.getElementById('nh4-val');
+    const toluenoVal = document.getElementById('tolueno-val');
     const lightVal = document.getElementById('light-val');
     const lightStatus = document.getElementById('light-status');
-    
+
     const ledSwitch = document.getElementById('led-switch');
     const ledStatusText = document.getElementById('led-status-text');
     const brokerIpDisplay = document.getElementById('broker-ip');
@@ -41,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Conectar al Broker MQTT a través de WebSockets
     function connectMQTT(brokerIp) {
         console.log(`Conectando al Broker MQTT en ws://${brokerIp}:9001...`);
-        
+
         try {
             // MQTT.js sobre WebSockets
             mqttClient = mqtt.connect(`ws://${brokerIp}:9001`, {
@@ -55,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('¡Conectado exitosamente al broker MQTT!');
                 mqttStatusBadge.className = 'status-badge connected';
                 mqttStatusText.textContent = 'Conectado';
-                
+
                 // Suscribirse a los topics de telemetría y estado de actuadores
                 mqttClient.subscribe('sensor/ambiente');
                 mqttClient.subscribe('sensor/led/state');
@@ -112,21 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 humProgress.style.width = `${Math.max(0, Math.min(100, h))}%`;
             }
 
-            // Calidad del Aire (Gas MQ135)
-            if (data.gas !== undefined) {
-                const g = parseInt(data.gas);
-                gasVal.textContent = g;
-                
-                if (g < 500) {
-                    gasStatus.textContent = 'Excelente';
-                    gasStatus.className = 'label-normal';
-                } else if (g >= 500 && g < 1000) {
-                    gasStatus.textContent = 'Moderado / Advertencia';
-                    gasStatus.className = 'label-warning';
-                } else {
-                    gasStatus.textContent = 'Pobre / Peligroso';
-                    gasStatus.className = 'label-danger';
-                }
+            // Calidad del Aire (Gases MQ135)
+            if (data.co2 !== undefined) {
+                co2Val.textContent = parseFloat(data.co2).toFixed(1) + ' ppm';
+            }
+            if (data.co !== undefined) {
+                coVal.textContent = parseFloat(data.co).toFixed(2) + ' ppm';
+            }
+            if (data.alcohol !== undefined) {
+                alcoholVal.textContent = parseFloat(data.alcohol).toFixed(2) + ' ppm';
+            }
+            if (data.nh4 !== undefined) {
+                nh4Val.textContent = parseFloat(data.nh4).toFixed(2) + ' ppm';
+            }
+            if (data.tolueno !== undefined) {
+                toluenoVal.textContent = parseFloat(data.tolueno).toFixed(2) + ' ppm';
             }
 
             // Luminosidad (LDR)
@@ -134,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.luz !== undefined) {
                 const l = parseInt(data.luz);
                 lightVal.textContent = l;
-                
+
                 if (l > 3000) {
                     lightStatus.textContent = 'Soleado / Día';
                     lightStatus.className = 'label-normal';
@@ -145,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     lightStatus.textContent = 'Oscuro / Noche';
                     lightStatus.className = 'label-normal';
                     // Cambiar estilo de texto a apagado si está oscuro
-                    lightStatus.style.color = '#8b5cf6'; 
+                    lightStatus.style.color = '#8b5cf6';
                 }
             }
 
